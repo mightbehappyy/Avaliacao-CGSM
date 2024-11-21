@@ -16,8 +16,10 @@ end
 function scene:create(event)
     local sceneGroup = self.view
     
-    local bg = display.newRect(sceneGroup, 0, 0, 1800, 2990)
-    bg.fill = {1, 0, 0, 1}
+    local bg = display.newImage(sceneGroup, "assets/background.png")
+    bg.x = 383
+    bg.y = 500 
+    bg.height = 1120
     
     local btPrev = display.newImage(sceneGroup, "assets/previous.png")
     local btprevPadding = (btPrev.height + btPrev.width) / 6
