@@ -6,7 +6,8 @@ local scene = composer.newScene()
 
 local myText
 local currentPage = 3
-
+local narration = audio.loadStream("assets/page3.mp3")
+local audioHandler
 
 local function updatePageText()
     if myText then
@@ -28,11 +29,20 @@ local function closeConnections()
             display.remove(connectionGroup[i])
         end
     end
+    if connections then
+        connections.x = 5000
+    end
+
+    if connections1 then
+        connections1.x = 5000
+    end
 end
 
 local function showModal(infoText)
     if isModalVisible then return end
     isModalVisible = true
+
+    audioHandler = audio.play(narration)
 
     modalGroup = display.newGroup()
     scene.view:insert(modalGroup)
@@ -95,7 +105,7 @@ local function createConnection(x, y, number)
         connections1.y = y
     else
         
-        local connections = display.newImage(connectionGroup, "assets/double_connections.png")
+        connections = display.newImage(connectionGroup, "assets/double_connections.png")
         if not connections then
             print("Error: Image 'three_connections.png' not found!")
             return
@@ -106,7 +116,7 @@ local function createConnection(x, y, number)
         connections.y = y
         y = y + 298
 
-        local connections1 = display.newImage(connectionGroup, "assets/double_connections.png")
+        connections1 = display.newImage(connectionGroup, "assets/double_connections.png")
         if not connections1 then
             print("Error: Image 'three_connections.png' not found!")
             return
@@ -115,8 +125,9 @@ local function createConnection(x, y, number)
         connections1.width = 150
         connections1.x = x
         connections1.y = y
-        
+    
     end
+    
 end
 
 
@@ -330,6 +341,7 @@ function scene:hide(event)
     local phase = event.phase
     if phase == "will" then
         closeModal() 
+        closeConnections()
         closeConnections()
     end
 end
