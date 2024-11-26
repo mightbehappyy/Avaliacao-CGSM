@@ -44,10 +44,10 @@ function scene:create(event)
     
     local bg = display.newImage(sceneGroup, "assets/background.png")
     bg.fill.effect = "filter.blurGaussian"
-    bg.fill.effect.horizontal.blurSize = 5
-    bg.fill.effect.horizontal.sigma = 30
-    bg.fill.effect.vertical.blurSize = 5
-    bg.fill.effect.vertical.sigma = 30
+    bg.fill.effect.horizontal.blurSize = 15
+    bg.fill.effect.horizontal.sigma = 50
+    bg.fill.effect.vertical.blurSize = 20
+    bg.fill.effect.vertical.sigma = 50
     bg.x = display.contentCenterX
     bg.y = display.contentCenterY
     bg.height = 1120
@@ -78,15 +78,15 @@ function scene:create(event)
     })
     muteText:setFillColor(0, 0, 0)
     
-    local title = display.newText(sceneGroup, "O que é DNA?", display.contentCenterX, 50, native.systemFont, 60)
+    local title = display.newText(sceneGroup, "O que é DNA?", display.contentCenterX, 35, native.systemFont, 60)
     title:setFillColor(0, 0, 0)
     
     
     instructionText = display.newText({
         parent = sceneGroup,
-        text = "Faça o gesto de pinça sobre João para ampliar a imagem e revelar o DNA de João.",
+        text = "O DNA (Ácido Desoxirribonucléico) é composto por milhões de nucleotídeos ligados uns aos outros. Separadamente, nucleotídeos são bastante  simples, consistindo de três partes diferentes: 1. Bases Nitrogenadas 2. Agrupamento de fosfato 3. Desoxirribose",
         x = display.contentCenterX,
-        y = 450,
+        y = 400,
         width = 650,
         font = native.systemFont,
         fontSize = 25
@@ -99,7 +99,7 @@ function scene:create(event)
         parent = sceneGroup,
         text = "O DNA (ácido desoxirribonucleico) é uma molécula que carrega a informação genética da maioria dos seres vivos. Ele é composto por nucleotídeos, e em sua forma típica, apresenta-se como uma dupla-hélice. O DNA pode ser encontrado no núcleo das células eucarióticas e em organelas como mitocôndrias e cloroplastos. Nos organismos procariontes, ele está presente no nucleoide.",
         x = 380,
-        y = 250,
+        y = 200,
         width = 650,
         font = native.systemFont,
         fontSize = 25
@@ -107,11 +107,11 @@ function scene:create(event)
     infoText:setFillColor(0, 0, 0)
 
     
-    personImage = display.newImage(sceneGroup, "assets/joao.png")
+    personImage = display.newImage(sceneGroup, "assets/dna.png")
     personImage.x = display.contentCenterX
-    personImage.y = 600
-    personImage.height = 800
-    personImage.width = 400
+    personImage.y = 665
+    personImage.width = personImage.width * 0.5
+    personImage.height = personImage.height * 0.5
 
     
     myText = display.newText(sceneGroup, "" .. currentPage, display.contentCenterX, 980, native.systemFont, 40)
