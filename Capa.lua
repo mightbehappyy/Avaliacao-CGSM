@@ -4,10 +4,31 @@
 local composer = require("composer")
 
 local scene = composer.newScene()
+local narration = audio.loadStream("assets/capa.mp3")
+local audioHandler
+local muteText
+
+local function toggleMute()
+    local isMuted = composer.getVariable("isMuted") or false
+    isMuted = not isMuted
+    composer.setVariable("isMuted", isMuted)
+
+    if isMuted then
+        audio.setVolume(0, {channel = musicChannel})
+        soundBt.fill = {type = "image", filename = "assets/mute-icon.png"}
+        muteText.text = "Ligar áudio"
+    else
+        audio.setVolume(1, {channel = musicChannel})
+        soundBt.fill = {type = "image", filename = "assets/sound-icon.png"}
+        muteText.text = "Desligar áudio"
+    end
+end
 
 -- create()
 function scene:create(event)
     local sceneGroup = self.view
+
+    audioHandler = audio.play(narration)
 
     -- Set up background
     local bg = display.newImage(sceneGroup, "assets/cover.png")
@@ -21,11 +42,23 @@ function scene:create(event)
     btNxt.height = 100
     btNxt.width = 245
 
-    local soundBt = display.newImage(sceneGroup, "assets/sound-icon.png")
-    soundBt.height = 30
-    soundBt.width = 30
-    soundBt.y = soundBt.height - 30
-    soundBt.x = display.contentWidth - soundBt.width
+    soundBt = display.newImage(sceneGroup, "assets/sound-icon.png")
+    soundBt.x = display.contentCenterX
+    soundBt.y = 920
+    soundBt.height = 50
+    soundBt.width = 50
+    soundBt:addEventListener("tap", toggleMute)
+
+    muteText = display.newText({
+        parent = sceneGroup, 
+        text = "Desligar áudio",
+        x = display.contentCenterX,
+        y = 950,  
+        font = native.systemFont, 
+        fontSize = 25    
+    })
+    muteText:setFillColor(0, 0, 0)
+    
 
     -- Add listener for "Next" button
     btNxt:addEventListener("tap", function(event)
@@ -46,7 +79,21 @@ function scene:show(event)
     local phase = event.phase
 
     if (phase == "will") then
-        -- Code here runs when the scene is still off screen (but is about to come on screen)
+        local isMuted = composer.getVariable("isMuted") or false
+        if isMuted then
+            audio.setVolume(0, {channel = musicChannel})
+            soundBt.fill = {type = "image", filename = "assets/mute-icon.png"}
+            muteText.text = "Ligar áudio"
+        else
+            audio.setVolume(1, {channel = musicChannel})
+            soundBt.fill = {type = "image", filename = "assets/sound-icon.png"}
+            muteText.text = "Desligar áudio"
+        end
+        
+        if not audio.isChannelActive(1) then
+            narration = audio.loadStream("assets/capa.mp3")
+            musicChannel = audio.play(narration, {loops = 0, channel = 1})
+        end
     elseif (phase == "did") then
         -- Code here runs when the scene is entirely on screen
     end
@@ -54,20 +101,21 @@ end
 
 -- hide()
 function scene:hide(event)
-    local sceneGroup = self.view
-    local phase = event.phase
-
-    if (phase == "will") then
-        -- Code here runs when the scene is on screen (but is about to go off screen)
-    elseif (phase == "did") then
-        -- Code here runs immediately after the scene goes entirely off screen
+    if event.phase == "will" then
+        if audio.isChannelActive(1) then
+            audio.stop(1)
+        end
     end
 end
 
+
 -- destroy()
 function scene:destroy(event)
-    local sceneGroup = self.view
-    -- Code here runs prior to the removal of scene's view
+    if narration then
+        audio.dispose(narration)
+        narration = nil
+        audio.stop(1)
+    end
 end
 
 -- -----------------------------------------------------------------------------------

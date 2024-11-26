@@ -19,7 +19,6 @@ local function updatePageText()
     end
 end
 
-
 local function toggleMute()
     local isMuted = composer.getVariable("isMuted") or false
     isMuted = not isMuted
