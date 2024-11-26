@@ -1,14 +1,13 @@
 local composer = require("composer")
 local widget = require("widget")
 
-
 local scene = composer.newScene()
 
 local myText
 local currentPage = 3
-local narration = audio.loadStream("assets/page3.mp3")
+local narration = audio.loadStream("assets/pag3.mp3")
 local audioHandler
-
+local muteText
 local function updatePageText()
     if myText then
         myText.text = " " .. currentPage
@@ -41,8 +40,6 @@ end
 local function showModal(infoText)
     if isModalVisible then return end
     isModalVisible = true
-
-    audioHandler = audio.play(narration)
 
     modalGroup = display.newGroup()
     scene.view:insert(modalGroup)
@@ -131,14 +128,12 @@ local function createConnection(x, y, number)
 end
 
 
-
-
 local function guanineConnection()
-    createConnection(350, 650, 3)
+    createConnection(385, 600, 3)
 end
 
 local function adenineConnection()
-    createConnection(350, 551, 2)
+    createConnection(385, 500, 2)
 end
 
 local function onGuanineTap(event)
@@ -161,9 +156,27 @@ local function onAdenineTap(event)
     adenineConnection()
 end
 
+local function toggleMute()
+    local isMuted = composer.getVariable("isMuted") or false
+    isMuted = not isMuted
+    composer.setVariable("isMuted", isMuted)
+
+    if isMuted then
+        audio.setVolume(0, {channel = musicChannel})
+        soundBt.fill = {type = "image", filename = "assets/mute-icon.png"}
+        muteText.text = "Ligar áudio"
+    else
+        audio.setVolume(1, {channel = musicChannel})
+        soundBt.fill = {type = "image", filename = "assets/sound-icon.png"}
+        muteText.text = "Desligar áudio"
+    end
+end
+
 -- create()
 function scene:create(event)
     local sceneGroup = self.view
+
+    audioHandler = audio.play(narration)
 
     local bg = display.newImage(sceneGroup, "assets/background.png")
     bg.x = 383
@@ -179,19 +192,18 @@ function scene:create(event)
     bg.fill.effect.vertical.sigma = 30
     
     local btPrev = display.newImage(sceneGroup, "assets/previous.png")
-    local btprevPadding = (btPrev.height + btPrev.width) / 6
-    
-    local btNxt = display.newImage(sceneGroup, "assets/next.png")
-    btNxt.x = display.contentWidth - btNxt.width + 100
-    btNxt.y = display.contentHeight - btprevPadding + 20
-    
-    local soundBt = display.newImage(sceneGroup, "assets/sound-icon.png")
-    soundBt.height = 25
-    soundBt.width = 25
-    soundBt.y = 0
-    soundBt.x = soundBt.width
+    btPrev.x = 135
+    btPrev.y = display.contentHeight - 80
+    btPrev.height = 100
+    btPrev.width = 250
 
-    title = display.newText(sceneGroup, "Bases Nitrogenadas", 325, 20, native.systemFont, 60)
+    local btNxt = display.newImage(sceneGroup, "assets/next.png")
+    btNxt.x = display.contentWidth - 135
+    btNxt.y = display.contentHeight - 80
+    btNxt.height = 100
+    btNxt.width = 245
+
+    title = display.newText(sceneGroup, "Bases Nitrogenadas", display.contentCenterX, 60, native.systemFont, 60)
     title:setFillColor(0, 0, 0)
     
     local infoText = display.newText({
@@ -205,6 +217,16 @@ function scene:create(event)
     })
     infoText:setFillColor(0, 0, 0)
 
+    muteText = display.newText({
+        parent = sceneGroup, 
+        text = "Desligar áudio",
+        x = display.contentCenterX,
+        y = 940,  
+        font = native.systemFont, 
+        fontSize = 25    
+    })
+    muteText:setFillColor(0, 0, 0)
+    
 
     local infoText = display.newText({
         parent = sceneGroup, 
@@ -217,18 +239,26 @@ function scene:create(event)
     })
     infoText:setFillColor(0, 0, 0)
     
-    local centerX = 200
-    local centerY = 700
+    local centerX = 235
+    local centerY = 650
     local width = 50
     local height = 430
 
     local rectangle = display.newRect(sceneGroup, centerX, centerY, width, height)
     rectangle:setFillColor(0, 0, 1)
 
-    local centerX = 500
-    local centerY = 700
+    local centerX = 535
+    local centerY = 650
     local width = 50
     local height = 430
+
+     
+    btNxt:addEventListener("tap", function()
+        composer.gotoScene("Page3", {effect = "flip", time = 300})
+    end)
+    btPrev:addEventListener("tap", function()
+        composer.gotoScene("Capa", {effect = "flip", time = 300})
+    end)
 
     local rectangle1 = display.newRect(sceneGroup,centerX, centerY, width, height)
     rectangle1:setFillColor(0, 0, 1)
@@ -252,20 +282,13 @@ function scene:create(event)
             time = 300
         })
     end)
-    btPrev.x = 0 + btprevPadding
-    btPrev.y = display.contentHeight - btprevPadding
-    btNxt.height = 100
-    btNxt.width = 250
-
-
-    btPrev.x = btprevPadding
-    btPrev.y = display.contentHeight - (btprevPadding)
-
-    btPrev.x = btprevPadding + 80
-    btPrev.y = display.contentHeight - (btprevPadding - 20)
     
-    btPrev.height = 100
-    btPrev.width = 250
+    soundBt = display.newImage(sceneGroup, "assets/sound-icon.png")
+    soundBt.x = display.contentCenterX
+    soundBt.y = 900
+    soundBt.height = 50
+    soundBt.width = 50
+    soundBt:addEventListener("tap", toggleMute)
 
     local timine = display.newImage(sceneGroup, "assets/t.png")
     local guanine = display.newImage(sceneGroup, "assets/g.png")
@@ -274,23 +297,23 @@ function scene:create(event)
     
     timine.height = 50
     timine.width = 50
-    timine.x = 250
-    timine.y = 550
+    timine.x = 285  
+    timine.y = 500
 
     guanine.height = 50
     guanine.width = 50
-    guanine.x = 250
-    guanine.y = 650
+    guanine.x = 285
+    guanine.y = 600
 
     adenine.height = 50
     adenine.width = 50
-    adenine.x = 450
-    adenine.y = 550
+    adenine.x = 485
+    adenine.y = 500
 
     cytosine.height = 50
     cytosine.width = 50
-    cytosine.x = 450
-    cytosine.y = 650
+    cytosine.x = 485
+    cytosine.y = 600
 
     local timine1 = display.newImage(sceneGroup, "assets/t.png")
     local guanine1 = display.newImage(sceneGroup, "assets/g.png")
@@ -299,23 +322,23 @@ function scene:create(event)
 
     timine1.height = 50
     timine1.width = 50
-    timine1.x = 250
-    timine1.y = 850
+    timine1.x = 285
+    timine1.y = 800 
 
     guanine1.height = 50
     guanine1.width = 50
-    guanine1.x = 450
-    guanine1.y = 750
+    guanine1.x = 485
+    guanine1.y = 700
 
     adenine1.height = 50
     adenine1.width = 50
-    adenine1.x = 450
-    adenine1.y = 850
+    adenine1.x = 485
+    adenine1.y = 800
 
     cytosine1.height = 50
     cytosine1.width = 50
-    cytosine1.x = 250
-    cytosine1.y = 750
+    cytosine1.x = 285
+    cytosine1.y = 700
 
     guanine:addEventListener("tap", onGuanineTap)
     guanine1:addEventListener("tap", onGuanineTap)
@@ -329,6 +352,43 @@ function scene:create(event)
 
 end
 
+function scene:hide(event)
+    if event.phase == "will" then
+        
+        if audio.isChannelActive(1) then
+            audio.stop(1)
+        end
+        closeConnections()
+    end
+end
+
+function scene:show(event)
+    if event.phase == "did" then
+        currentPage = 3
+        updatePageText()
+        
+        
+        local isMuted = composer.getVariable("isMuted") or false
+        if isMuted then
+            audio.setVolume(0, {channel = musicChannel})
+            soundBt.fill = {type = "image", filename = "assets/mute-icon.png"}
+            muteText.text = "Ligar áudio"
+        else
+            audio.setVolume(1, {channel = musicChannel})
+            soundBt.fill = {type = "image", filename = "assets/sound-icon.png"}
+            muteText.text = "Desligar áudio"
+        end
+
+        
+        if not audio.isChannelActive(1) then
+            narration = audio.loadStream("assets/pag3.mp3")
+            musicChannel = audio.play(narration, {loops = 0, channel = 1})
+        end
+    end
+end
+
+
+
 local function onGuaninecytosineButtonPress(event)
     print("Guanine or cytosine pressed")
 end
@@ -337,26 +397,12 @@ local function onAdenineTimineButtonPress(event)
     print("Adenine or Timine pressed")
 end
 
-function scene:hide(event)
-    local phase = event.phase
-    if phase == "will" then
-        closeModal() 
-        closeConnections()
-        closeConnections()
-    end
-end
-
--- show()
-function scene:show(event)
-    local phase = event.phase
-    if phase == "did" then
-        currentPage = 3
-        updatePageText()  
-    end
-end
-
--- destroy()
 function scene:destroy(event)
+    if narration then
+        audio.dispose(narration)
+        narration = nil
+        audio.stop(1)
+    end
 end
 
 -- Scene event function listeners

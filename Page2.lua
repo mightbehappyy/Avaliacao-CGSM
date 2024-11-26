@@ -10,6 +10,7 @@ local musicChannel
 local soundBt
 local narration = audio.loadStream("assets/pag2.mp3")
 local audioHandler
+local muteText
 
 -- Update page text
 local function updatePageText()
@@ -18,18 +19,20 @@ local function updatePageText()
     end
 end
 
--- Toggle mute state
+
 local function toggleMute()
     local isMuted = composer.getVariable("isMuted") or false
     isMuted = not isMuted
     composer.setVariable("isMuted", isMuted)
-    
+
     if isMuted then
         audio.setVolume(0, {channel = musicChannel})
         soundBt.fill = {type = "image", filename = "assets/mute-icon.png"}
+        muteText.text = "Ligar áudio"
     else
         audio.setVolume(1, {channel = musicChannel})
         soundBt.fill = {type = "image", filename = "assets/sound-icon.png"}
+        muteText.text = "Desligar áudio"
     end
 end
 
@@ -37,8 +40,6 @@ end
 function scene:create(event)
     local sceneGroup = self.view
 
-    
-    system.activate("multitouch")
     audioHandler = audio.play(narration)
     
     local bg = display.newImage(sceneGroup, "assets/background.png")
@@ -50,6 +51,9 @@ function scene:create(event)
     bg.x = display.contentCenterX
     bg.y = display.contentCenterY
     bg.height = 1120
+    bg.x = 385
+    bg.y = 550
+
 
     
     local btPrev = display.newImage(sceneGroup, "assets/previous.png")
@@ -64,10 +68,19 @@ function scene:create(event)
     btNxt.height = 100
     btNxt.width = 245
 
+    muteText = display.newText({
+        parent = sceneGroup, 
+        text = "Desligar áudio",
+        x = display.contentCenterX,
+        y = 950,  
+        font = native.systemFont, 
+        fontSize = 25    
+    })
+    muteText:setFillColor(0, 0, 0)
     
     local title = display.newText(sceneGroup, "O que é DNA?", display.contentCenterX, 50, native.systemFont, 60)
     title:setFillColor(0, 0, 0)
-
+    
     
     instructionText = display.newText({
         parent = sceneGroup,
@@ -80,6 +93,7 @@ function scene:create(event)
     })
     instructionText:setFillColor(0, 0, 0)
 
+    
     
     local infoText = display.newText({
         parent = sceneGroup,
@@ -105,13 +119,13 @@ function scene:create(event)
 
     
     soundBt = display.newImage(sceneGroup, "assets/sound-icon.png")
-    soundBt.x = 50
-    soundBt.y = 50
+    soundBt.x = display.contentCenterX
+    soundBt.y = 920
     soundBt.height = 50
     soundBt.width = 50
     soundBt:addEventListener("tap", toggleMute)
 
-    -- Button Listeners
+    
     btNxt:addEventListener("tap", function()
         composer.gotoScene("Page3", {effect = "flip", time = 300})
     end)
@@ -120,39 +134,47 @@ function scene:create(event)
     end)
 end
 
--- Show the scene
-function scene:show(event)
-    if event.phase == "did" then
-        currentPage = 2
-        updatePageText()
-
-    
-        -- Set Mute State
-        local isMuted = composer.getVariable("isMuted") or false
-        if isMuted then
-            audio.setVolume(0, {channel = musicChannel})
-            soundBt.fill = {type = "image", filename = "assets/mute-icon.png"}
-        else
-            audio.setVolume(1, {channel = musicChannel})
-            soundBt.fill = {type = "image", filename = "assets/sound-icon.png"}
+function scene:hide(event)
+    if event.phase == "will" then
+        if audio.isChannelActive(1) then
+            audio.stop(1)
         end
     end
 end
 
-function scene:hide(event)
-    if event.phase == "will" then
+
+function scene:show(event)
+    if event.phase == "did" then
+        currentPage = 2 
+        updatePageText()
         
-        audio.stop(musicChannel)
+        
+        local isMuted = composer.getVariable("isMuted") or false
+        if isMuted then
+            audio.setVolume(0, {channel = musicChannel})
+            soundBt.fill = {type = "image", filename = "assets/mute-icon.png"}
+            muteText.text = "Ligar áudio"
+        else
+            audio.setVolume(1, {channel = musicChannel})
+            soundBt.fill = {type = "image", filename = "assets/sound-icon.png"}
+            muteText.text = "Desligar áudio"
+        end
+        
+        if not audio.isChannelActive(1) then
+            narration = audio.loadStream("assets/pag2.mp3")
+            musicChannel = audio.play(narration, {loops = 0, channel = 1})
+        end
     end
 end
 
--- Destroy the scene
 function scene:destroy(event)
-    if backgroundMusic then
-        audio.dispose(backgroundMusic)
-        backgroundMusic = nil
+    if narration then
+        audio.dispose(narration)
+        narration = nil
+        audio.stop(1)
     end
 end
+
 
 -- Scene Listeners
 scene:addEventListener("create", scene)

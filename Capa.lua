@@ -11,17 +11,16 @@ function scene:create(event)
 
     -- Set up background
     local bg = display.newImage(sceneGroup, "assets/cover.png")
-    bg.x = 383
-    bg.y = 500
+    bg.x = 385
+    bg.y = 550
     bg.height = 1120
 
-    -- Set up "Next" button
     local btNxt = display.newImage(sceneGroup, "assets/next.png")
-    local padding = (btNxt.height + btNxt.width) / 6
-    btNxt.x = display.contentWidth - btNxt.width + 100
-    btNxt.y = display.contentHeight - padding + 20
+    btNxt.x = display.contentWidth - 135
+    btNxt.y = display.contentHeight - 80
+    btNxt.height = 100
+    btNxt.width = 245
 
-    -- Set up "Sound" button
     local soundBt = display.newImage(sceneGroup, "assets/sound-icon.png")
     soundBt.height = 30
     soundBt.width = 30

@@ -7,10 +7,9 @@ function scene:create(event)
     local sceneGroup = self.view
     
     local bg = display.newImage(sceneGroup, "assets/countercover.png")
-    bg.height = 1120
+    bg.height = 1050
     bg.x = 383
     bg.y = 500 
-    bg.height = 1120
     local btPrev = display.newImage(sceneGroup, "assets/previous.png")
     local btprevPadding = (btPrev.height + btPrev.width) / 6
     
